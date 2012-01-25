@@ -130,6 +130,9 @@ void mof_Font__printf(mof_Font *font, char *c, int x, int y){
   font->fontRect.x = x;
   font->fontRect.y = y;
   SDL_BlitSurface(font->fontSurface, NULL, font->screen, &font->fontRect);
+  
+  /* avoid memory leakage (should think of a bettet solution) */
+  SDL_FreeSurface(font->fontSurface);
 }
 
 #endif

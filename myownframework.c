@@ -11,13 +11,13 @@
 #include "SDL_gfxPrimitives.h"
 #include "SDL_ttf.h"
 
-#include "mof/mof_player.h"
 #include "mof/mof_collisionbox.h"
 #include "mof/mof_font.h"
 #include "mof/mof_keyboard.h"
 #include "mof/mof_map.h"
-#include "mof/mof_time.h"
+#include "mof/mof_player.h"
 #include "mof/mof_raycaster.h"
+#include "mof/mof_time.h"
 
 SDL_Surface *screen;
 SDL_Event event;
@@ -34,9 +34,6 @@ mof_Time *timer = NULL;
 
 char test[100] = {"/0"};
 
-int positionX = 200;
-int positionY = 200;
-
 /**
  * Initialization.
  */
@@ -52,9 +49,9 @@ void mof__init()
   /* keyboard */
   //SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
   
+  level = mof_Map__new(screen);
   player = mof_Player__new(screen, 320, 320, 90);
   text = mof_Font__new(screen, WINDOW_FONT);
-  level = mof_Map__new(screen);
   timer = mof_Time__new(); 
 }
 
@@ -78,11 +75,7 @@ void mof__unload()
  * @param running_loop Determine if the loop still have to be executed.
  */
 void mof__update(int *running_loop)
-{
-  int i, j;
-  int w, z, flag = 0;
-  mof_Collisionbox *bkup = NULL;
-	
+{	
   if (SDL_PollEvent(&event))
   {
 	/* handling the SDL window */
@@ -167,7 +160,7 @@ int main(int argc, char **argv)
 
       mof__draw();
 	  
-	  //Print to bottom of screen
+	  /* print to bottom of screen */
 	  sprintf(test, "(elapsed) milli: %3.3lld -- micro: %6.6lld", mof_Time__gettime_elapsed_msec(timer), mof_Time__gettime_elapsed_usec(timer));
 	  mof_Font__printf(text, test, 20, screen->h - 40);
 	  
@@ -175,16 +168,16 @@ int main(int argc, char **argv)
 	
 	mof_Time__stop(timer);
 	  
-	//Print to bottom of screen
+	/* print to bottom of screen */
 	sprintf(test, "(drawing) milli: %3.3lld -- micro: %6.6lld", mof_Time__gettime_msec(timer), mof_Time__gettime_usec(timer));
 	mof_Font__printf(text, test, 20, screen->h - 20);
 
 	SDL_Flip(screen);
   }
 
+  mof_Map__destroy(level);
   mof_Player__destroy(player);
   mof_Font__destroy(text);
-  mof_Map__destroy(level);
   mof_Time__destroy(timer);
   SDL_Quit();
 
