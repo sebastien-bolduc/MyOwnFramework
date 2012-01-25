@@ -17,6 +17,7 @@
 #include "mof/mof_keyboard.h"
 #include "mof/mof_map.h"
 #include "mof/mof_time.h"
+#include "mof/mof_raycaster.h"
 
 SDL_Surface *screen;
 SDL_Event event;
@@ -51,7 +52,7 @@ void mof__init()
   /* keyboard */
   //SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
   
-  player = mof_Player__new(screen, 320, 240, 90);
+  player = mof_Player__new(screen, 320, 320, 90);
   text = mof_Font__new(screen, WINDOW_FONT);
   level = mof_Map__new(screen);
   timer = mof_Time__new(); 
@@ -135,10 +136,15 @@ void mof__update(int *running_loop)
  */
 void mof__draw()
 {
+  /* clear the screen */
   SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
   
-  mof_Map__draw(level);
-  mof_Player__draw(player);
+  int offsetX = mof_Player__offsetX(player, 240);
+  int offsetY = mof_Player__offsetY(player, 240);
+  
+  mof_Map__draw(level, offsetX, offsetY);
+  mof_Player__draw(player, offsetX, offsetY);
+  mof_Raycaster__draw(player, level, offsetX, offsetY);
 }
 
 /**

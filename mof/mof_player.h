@@ -1,6 +1,6 @@
 /**
  * @author Sebastien Bolduc <sebastien.bolduc@gmail.com>
- * @version 1.00
+ * @version 1.10
  * @since 2012-01-21
  */
  
@@ -367,23 +367,71 @@ void mof_Player__moveright(mof_Player *player, mof_Map *level)
 }
 
 /**
- * Drawing player.
+ * Offset X for scrolling.
  * 
  * @param player Pointer to a mof_Player object.
+ * @param limit  Limit for the player offset.
+ * @return       Offset base on the player position.
  */
-void mof_Player__draw(mof_Player *player)
+int mof_Player__offsetX(mof_Player *player, int limit)
+{
+  int max_offset = (10 * 64)  - player->screen->w;
+  int offset = ((mof_Avatar *)player)->x - limit;
+  
+  if (max_offset < 0)
+	max_offset = 0;
+  
+  if (offset < 0)
+	return 0;
+  else if (offset >= max_offset)
+	return max_offset;
+  else
+	return offset;
+}
+
+/**
+ * Offset Y for scrolling.
+ * 
+ * @param player Pointer to a mof_Player object.
+ * @param limit  Limit for the player offset.
+ * @return       Offset base on the player position.
+ */
+int mof_Player__offsetY(mof_Player *player, int limit)
+{
+  int max_offset = (10 * 64)  - player->screen->h;
+  int offset = ((mof_Avatar *)player)->y - limit;
+  
+  if (max_offset < 0)
+	max_offset = 0;
+  
+  if (offset < 0)
+	return 0;
+  else if (offset >= max_offset)
+	return max_offset;
+  else
+	return offset;
+}
+
+/**
+ * Drawing player.
+ * 
+ * @param player  Pointer to a mof_Player object.
+ * @param offsetX Offset for the X coordinate.
+ * @param offsetY Offset for the Y coordinate.
+ */
+void mof_Player__draw(mof_Player *player, int offsetX, int offsetY)
 {
   /* check if we have a valid mof_Player object */
   mof_Player__check(player);
   
-  filledEllipseRGBA(player->screen, ((mof_Avatar *)player)->x, ((mof_Avatar *)player)->y, 10, 10, 255, 0, 0, 255);
-  int lineX = ((mof_Avatar *)player)->x - (int)(cos((double)((mof_Avatar *)player)->angle * M_PI / 180) * 20);
-  int lineY = ((mof_Avatar *)player)->y - (int)(sin((double)((mof_Avatar *)player)->angle * M_PI / 180) * 20);
-  int arrow1X = ((mof_Avatar *)player)->x - (int)(cos((double)(((mof_Avatar *)player)->angle + 30) * M_PI / 180) * 14);
-  int arrow1Y = ((mof_Avatar *)player)->y - (int)(sin((double)(((mof_Avatar *)player)->angle + 30) * M_PI / 180) * 14);
-  int arrow2X = ((mof_Avatar *)player)->x - (int)(cos((double)(((mof_Avatar *)player)->angle - 30) * M_PI / 180) * 14);
-  int arrow2Y = ((mof_Avatar *)player)->y - (int)(sin((double)(((mof_Avatar *)player)->angle - 30) * M_PI / 180) * 14); 
-  lineRGBA(player->screen, (int)((mof_Avatar *)player)->x, (int)((mof_Avatar *)player)->y, lineX, lineY, 0, 255, 0, 255);
+  filledEllipseRGBA(player->screen, ((mof_Avatar *)player)->x - offsetX, ((mof_Avatar *)player)->y - offsetY, 10, 10, 255, 0, 0, 255);
+  int lineX = ((mof_Avatar *)player)->x - offsetX - (int)(cos((double)((mof_Avatar *)player)->angle * M_PI / 180) * 20);
+  int lineY = ((mof_Avatar *)player)->y - offsetY - (int)(sin((double)((mof_Avatar *)player)->angle * M_PI / 180) * 20);
+  int arrow1X = ((mof_Avatar *)player)->x - offsetX - (int)(cos((double)(((mof_Avatar *)player)->angle + 30) * M_PI / 180) * 14);
+  int arrow1Y = ((mof_Avatar *)player)->y - offsetY - (int)(sin((double)(((mof_Avatar *)player)->angle + 30) * M_PI / 180) * 14);
+  int arrow2X = ((mof_Avatar *)player)->x - offsetX - (int)(cos((double)(((mof_Avatar *)player)->angle - 30) * M_PI / 180) * 14);
+  int arrow2Y = ((mof_Avatar *)player)->y - offsetY - (int)(sin((double)(((mof_Avatar *)player)->angle - 30) * M_PI / 180) * 14); 
+  lineRGBA(player->screen, (int)((mof_Avatar *)player)->x - offsetX, (int)((mof_Avatar *)player)->y - offsetY, lineX, lineY, 0, 255, 0, 255);
   lineRGBA(player->screen, arrow1X, arrow1Y, lineX, lineY, 0, 255, 0, 255);
   lineRGBA(player->screen, arrow2X, arrow2Y, lineX, lineY, 0, 255, 0, 255);
 }

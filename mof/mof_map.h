@@ -1,6 +1,6 @@
 /**
  * @author Sebastien Bolduc <sebastien.bolduc@gmail.com>
- * @version 1.10
+ * @version 1.20
  * @since 2012-01-17
  */
 
@@ -62,7 +62,7 @@ void mof_Map__createCollisionbox(mof_Map *map)
 	{
 	  if (map->map[(i * 10) + j])
 	  {
-		mof_Collisionbox__add(map->collision, j * 64, i * 48, 64, 48);
+		mof_Collisionbox__add(map->collision, j * 64, i * 64, 64, 64);
 	  }
 	}
   }
@@ -79,7 +79,7 @@ void mof_Map__construct(mof_Map *map)
   map->type |= MOF_MAP_TYPE;
    
   map->map = mof_Map__loadmap();
-  map->collision = mof_Collisionbox__new(0, 0, 64, 48);
+  map->collision = mof_Collisionbox__new(0, 0, 64, 64);
   
   /* create collision box for map */
   mof_Map__createCollisionbox(map);
@@ -142,9 +142,11 @@ void mof_Map__destroy(mof_Map *map)
 /**
  * Drawing map.
  * 
- * @param map Pointer to a mof_Map object.
+ * @param map     Pointer to a mof_Map object.
+ * @param offsetX Offset for the X coordinate.
+ * @param offsetY Offset for the Y coordinate.
  */
-void mof_Map__draw(mof_Map *map)
+void mof_Map__draw(mof_Map *map, int offsetX, int offsetY)
 {
   /* check if we have a valid mof_Map object */
   mof_Map__check(map);
@@ -156,7 +158,7 @@ void mof_Map__draw(mof_Map *map)
 	{
 	  if (map->map[(i * 10) + j])
 	  {
-		boxRGBA(map->screen, j * 64, i * 48, (j * 64) + 64, (i * 48) + 48, 0, 0, 255, 255);
+		boxRGBA(map->screen, j * 64 - offsetX, i * 64 - offsetY, (j * 64) + 64 - offsetX, (i * 64) + 64 - offsetY, 0, 0, 255, 255);
 	  }
 	}
   }
