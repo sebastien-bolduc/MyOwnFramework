@@ -1,6 +1,6 @@
 /**
  * @author Sebastien Bolduc <sebastien.bolduc@gmail.com>
- * @version 1.00
+ * @version 1.10
  * @since 2012-01-24
  */
 
@@ -15,17 +15,18 @@
 /**
  * Checking the limit of the map.
  * 
- * @param x Coordinate of the point to check.
- * @param y Coordinate of the point to check.
- * @return  True (1) if out of the limit of the map, false (0) otherwise.
+ * @param map Pointer to a mof_Map object.
+ * @param x   Coordinate of the point to check.
+ * @param y   Coordinate of the point to check.
+ * @return    True (1) if out of the limit of the map, false (0) otherwise.
  */
-int mof_Raycaster__limit(double x, double y)
+int mof_Raycaster__limit(mof_Map *map, double x, double y)
 {
-  if (x < 0 || x >= (10 * 64))			/* width */
+  if (x < 0 || x >= (map->width * map->unit))			/* width */
   {
 	return 1;
   }
-  else if (y < 0 || y >= (10 * 64))		/* height */
+  else if (y < 0 || y >= (map->height * map->unit))		/* height */
   {
 	return 1;
   }
@@ -69,9 +70,9 @@ double *mof_Raycaster__horizontal(mof_Player *player, mof_Map *map, double angle
   Py = ((mof_Avatar *)player)->y;
   
   if (angle >= 0 && angle <= 180)
-	Ynew = floor(Py / 64) * 64 - 1;
+	Ynew = floor(Py / map->unit) * map->unit - 1;
   else
-	Ynew = floor(Py / 64) * 64 + 64;
+	Ynew = floor(Py / map->unit) * map->unit + map->unit;
     
   if (angle == 90 || angle == 270)
     Xnew = Px;
@@ -79,7 +80,7 @@ double *mof_Raycaster__horizontal(mof_Player *player, mof_Map *map, double angle
 	Xnew = floor(Px + ((Py - Ynew) / tan(angle * M_PI / 180)));
 	
   /* checking to see if we are not out of bound */
-  if (mof_Raycaster__limit(Xnew, Ynew))
+  if (mof_Raycaster__limit(map, Xnew, Ynew))
   {
 	resultH[0] = -1;
 	return resultH;  
@@ -89,9 +90,9 @@ double *mof_Raycaster__horizontal(mof_Player *player, mof_Map *map, double angle
   double Ya = 0;
         
   if (angle >= 0 && angle <= 180)
-	Ya = -(64);
+	Ya = -(map->unit);
   else
-	Ya = 64;
+	Ya = map->unit;
 	
   /* find Xa */
   double Xa = 0;
@@ -99,26 +100,26 @@ double *mof_Raycaster__horizontal(mof_Player *player, mof_Map *map, double angle
   if (angle == 90 || angle == 270)
 	Xa = 0;
   else if (angle >= 0 && angle < 90)				/* correction for ray to not cross wall */
-	Xa = ceil(64 / tan(angle * M_PI / 180));
+	Xa = ceil(map->unit / tan(angle * M_PI / 180));
   else if (angle >= 90 && angle < 180)
-	Xa = floor(64 / tan(angle * M_PI / 180));
+	Xa = floor(map->unit / tan(angle * M_PI / 180));
   else if (angle >= 180 && angle < 270)
-	Xa = -(ceil(64 / tan(angle * M_PI / 180)));
+	Xa = -(ceil(map->unit / tan(angle * M_PI / 180)));
   else if (angle >= 270 && angle < 360)
-	Xa = -(floor(64 / tan(angle * M_PI / 180)));
+	Xa = -(floor(map->unit / tan(angle * M_PI / 180)));
   /*else if (angle > 180)
-	Xa = -(floor(64 / tan(angle * M_PI / 180)));
+	Xa = -(floor(map->unit / tan(angle * M_PI / 180)));
   else
-	Xa = floor(64 / tan(angle * M_PI / 180));*/
+	Xa = floor(map->unit / tan(angle * M_PI / 180));*/
 	
   /* check the grid at the intersection point for wall */
-  while (map->map[(int)(floor(Xnew / 64) + floor(Ynew / 64) * 10)] != 1)
+  while (map->map[(int)(floor(Xnew / map->unit) + floor(Ynew / map->unit) * map->width)] != 1)
   {   
 	Ynew += Ya;
 	Xnew += Xa;
         
 	/* checking to see if we are not out of bound */
-	if (mof_Raycaster__limit(Xnew, Ynew))
+	if (mof_Raycaster__limit(map, Xnew, Ynew))
     {
 	  resultH[0] = -1;
 	  return resultH; 
@@ -166,14 +167,14 @@ double *mof_Raycaster__vertical(mof_Player *player, mof_Map *map, double angle)
   Py = ((mof_Avatar *)player)->y;
   
   if (angle > 90 && angle < 270)
-	Xnew = floor(Px / 64) * 64 - 1;
+	Xnew = floor(Px / map->unit) * map->unit - 1;
   else
-	Xnew = floor(Px / 64) * 64 + 64;
+	Xnew = floor(Px / map->unit) * map->unit + map->unit;
     
   Ynew = floor(Py + ((Px - Xnew) * tan(angle * M_PI / 180)));
   
   /* checking to see if we are not out of bound */
-  if (mof_Raycaster__limit(Xnew, Ynew))
+  if (mof_Raycaster__limit(map, Xnew, Ynew))
   {
 	resultV[0] = -1;
 	return resultV;  
@@ -183,34 +184,34 @@ double *mof_Raycaster__vertical(mof_Player *player, mof_Map *map, double angle)
   double Xa = 0;
     
   if (angle > 90 && angle < 270)
-	Xa = -(64);
+	Xa = -(map->unit);
   else
-	Xa = 64;
+	Xa = map->unit;
     
   /* find Ya */
   double Ya = 0;
   
   if (angle >= 0 && angle < 90)						/* correction for ray to not cross wall */
-	Ya = -(ceil(64 * tan(angle * M_PI / 180)));
+	Ya = -(ceil(map->unit * tan(angle * M_PI / 180)));
   else if (angle >= 90 && angle < 180)
-	Ya = floor(64 * tan(angle * M_PI / 180));
+	Ya = floor(map->unit * tan(angle * M_PI / 180));
   else if (angle >= 180 && angle < 270)
-	Ya = ceil(64 * tan(angle * M_PI / 180));
+	Ya = ceil(map->unit * tan(angle * M_PI / 180));
   else if (angle >= 270 && angle < 360)
-	Ya = -(floor(64 * tan(angle * M_PI / 180)));
+	Ya = -(floor(map->unit * tan(angle * M_PI / 180)));
   /*if (angle > 90 && angle < 270)
-	Ya = floor(64 * tan(angle * M_PI / 180));
+	Ya = floor(map->unit * tan(angle * M_PI / 180));
   else
-	Ya = -(floor(64 * tan(angle * M_PI / 180)));*/
+	Ya = -(floor(map->unit * tan(angle * M_PI / 180)));*/
 	
   /* check the grid at the intersection point for wall */
-  while (map->map[(int)(floor(Xnew / 64) + floor(Ynew / 64) * 10)] != 1)
+  while (map->map[(int)(floor(Xnew / map->unit) + floor(Ynew / map->unit) * map->width)] != 1)
   {   
 	Ynew += Ya;
 	Xnew += Xa;
         
 	/* checking to see if we are not out of bound */
-	if (mof_Raycaster__limit(Xnew, Ynew))
+	if (mof_Raycaster__limit(map, Xnew, Ynew))
     {
 	  resultV[0] = -1;
 	  return resultV; 
@@ -236,7 +237,7 @@ mof_Raycaster__draw(mof_Player *player, mof_Map *map, int offsetX, int offsetY)
 {
   double *resultH, *resultV, *result;
   double i = 0;
-  for (i = 30; i >= -30; i -= 1)
+  for (i = 30; i >= -30; i -= 0.9375)
   {
     resultH = mof_Raycaster__horizontal(player, map, 180 - (double)((mof_Avatar *)player)->angle + i);
 	resultV = mof_Raycaster__vertical(player, map, 180 - (double)((mof_Avatar *)player)->angle + i);

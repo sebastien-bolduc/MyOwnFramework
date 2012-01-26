@@ -1,6 +1,6 @@
 /**
  * @author Sebastien Bolduc <sebastien.bolduc@gmail.com>
- * @version 1.10
+ * @version 1.20
  * @since 2012-01-21
  */
  
@@ -370,12 +370,13 @@ void mof_Player__moveright(mof_Player *player, mof_Map *level)
  * Offset X for scrolling.
  * 
  * @param player Pointer to a mof_Player object.
+ * @param map    Pointer to a mof_Map object.
  * @param limit  Limit for the player offset.
  * @return       Offset base on the player position.
  */
-int mof_Player__offsetX(mof_Player *player, int limit)
+int mof_Player__offsetX(mof_Player *player, mof_Map *map, int limit)
 {
-  int max_offset = (10 * 64)  - player->screen->w;
+  int max_offset = (map->width * map->unit)  - player->screen->w;
   int offset = ((mof_Avatar *)player)->x - limit;
   
   if (max_offset < 0)
@@ -393,12 +394,13 @@ int mof_Player__offsetX(mof_Player *player, int limit)
  * Offset Y for scrolling.
  * 
  * @param player Pointer to a mof_Player object.
+ * @param map    Pointer to a mof_Map object.
  * @param limit  Limit for the player offset.
  * @return       Offset base on the player position.
  */
-int mof_Player__offsetY(mof_Player *player, int limit)
+int mof_Player__offsetY(mof_Player *player, mof_Map *map, int limit)
 {
-  int max_offset = (10 * 64)  - player->screen->h;
+  int max_offset = (map->height * map->unit)  - player->screen->h;
   int offset = ((mof_Avatar *)player)->y - limit;
   
   if (max_offset < 0)

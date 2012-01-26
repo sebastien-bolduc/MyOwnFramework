@@ -132,8 +132,8 @@ void mof__draw()
   /* clear the screen */
   SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
   
-  int offsetX = mof_Player__offsetX(player, 240);
-  int offsetY = mof_Player__offsetY(player, 240);
+  int offsetX = mof_Player__offsetX(player, level, 320);
+  int offsetY = mof_Player__offsetY(player, level, 240);
   
   mof_Map__draw(level, offsetX, offsetY);
   mof_Player__draw(player, offsetX, offsetY);

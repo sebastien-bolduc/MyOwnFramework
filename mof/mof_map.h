@@ -1,6 +1,6 @@
 /**
  * @author Sebastien Bolduc <sebastien.bolduc@gmail.com>
- * @version 1.20
+ * @version 1.30
  * @since 2012-01-17
  */
 
@@ -21,8 +21,11 @@
 typedef struct {
   unsigned int type;
   int *map;
+  int width;						/* dimension in square(s) */
+  int height;
+  int unit;
   mof_Collisionbox *collision;
-  SDL_Surface *screen;		/* copy of the current SDL surface */
+  SDL_Surface *screen;				/* copy of the current SDL surface */
 } mof_Map;
 
 /**
@@ -32,17 +35,17 @@ typedef struct {
  */
 int *mof_Map__loadmap(void)
 {
-  static int map[100] = {
-						 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-						 1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-						 1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-						 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
-						 1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-						 1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-						 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
-						 1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-						 1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-						 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+  static int map[120] = {
+						 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+						 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+						 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
+						 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1,
+						 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
+						 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
+						 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1,
+						 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
+						 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+						 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
 					   };
 					
   return map;
@@ -56,13 +59,13 @@ int *mof_Map__loadmap(void)
 void mof_Map__createCollisionbox(mof_Map *map)
 {
   int i, j;
-  for (i = 0; i < 10; i++)
+  for (i = 0; i < map->height; i++)
   {
-	for (j = 0; j < 10; j++)
+	for (j = 0; j < map->width; j++)
 	{
-	  if (map->map[(i * 10) + j])
+	  if (map->map[(i * map->width) + j])
 	  {
-		mof_Collisionbox__add(map->collision, j * 64, i * 64, 64, 64);
+		mof_Collisionbox__add(map->collision, j * map->unit, i * map->unit, map->unit, map->unit);
 	  }
 	}
   }
@@ -79,7 +82,10 @@ void mof_Map__construct(mof_Map *map)
   map->type |= MOF_MAP_TYPE;
    
   map->map = mof_Map__loadmap();
-  map->collision = mof_Collisionbox__new(0, 0, 64, 64);
+  map->width = 12;
+  map->height = 10;
+  map->unit = 64;
+  map->collision = mof_Collisionbox__new(0, 0, map->unit, map->unit);
   
   /* create collision box for map */
   mof_Map__createCollisionbox(map);
@@ -152,13 +158,13 @@ void mof_Map__draw(mof_Map *map, int offsetX, int offsetY)
   mof_Map__check(map);
   
   int i, j;
-  for (i = 0; i < 10; i++)
+  for (i = 0; i < map->height; i++)
   {
-	for (j = 0; j < 10; j++)
+	for (j = 0; j < map->width; j++)
 	{
-	  if (map->map[(i * 10) + j])
+	  if (map->map[(i * map->width) + j])
 	  {
-		boxRGBA(map->screen, j * 64 - offsetX, i * 64 - offsetY, (j * 64) + 64 - offsetX, (i * 64) + 64 - offsetY, 0, 0, 255, 255);
+		boxRGBA(map->screen, j * map->unit - offsetX, i * map->unit - offsetY, (j * map->unit) + map->unit - offsetX, (i * map->unit) + map->unit - offsetY, 0, 0, 255, 255);
 	  }
 	}
   }
