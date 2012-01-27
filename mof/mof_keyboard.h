@@ -11,6 +11,7 @@ int MOF_KEYBOARD__SDLK_UP_FLAG = 0;
 int MOF_KEYBOARD__SDLK_DOWN_FLAG = 0;
 int MOF_KEYBOARD__SDLK_RIGHT_FLAG = 0;
 int MOF_KEYBOARD__SDLK_LEFT_FLAG = 0;
+int MOF_KEYBOARD__SDLK_m_FLAG = 0;
 
 /**
  * Set the flag of a keyboard's key.
@@ -33,6 +34,9 @@ void mof_Keyboard__setflag(SDLKey key, int value)
 	  break;
 	case SDLK_LEFT:
 	  MOF_KEYBOARD__SDLK_LEFT_FLAG = value;
+	  break;
+	case SDLK_m:
+	  MOF_KEYBOARD__SDLK_m_FLAG = value;
 	  break;
 	default:
 	  break;
@@ -80,6 +84,9 @@ int mof_Keyboard__checkkey(SDLKey key)
 	  break;
 	case SDLK_LEFT:
 	  return MOF_KEYBOARD__SDLK_LEFT_FLAG;
+	  break;
+	case SDLK_m:
+	  return MOF_KEYBOARD__SDLK_m_FLAG;
 	  break;
 	default:
 	  return 0;

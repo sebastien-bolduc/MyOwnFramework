@@ -1,6 +1,6 @@
 /**
  * @author Sebastien Bolduc <sebastien.bolduc@gmail.com>
- * @version 1.10
+ * @version 1.20
  * @since 2012-01-24
  */
 
@@ -252,6 +252,66 @@ mof_Raycaster__draw(mof_Player *player, mof_Map *map, int offsetX, int offsetY)
 	  result = resultV;
     
 	lineRGBA(player->screen, (int)((mof_Avatar *)player)->x - offsetX, (int)((mof_Avatar *)player)->y - offsetY, (int)result[1] - offsetX, (int)result[2] - offsetY, 255, 255, 0, 50);
+  }
+}
+
+/**
+ * Drawing the rays casted (3D).
+ * 
+ * @param player  Pointer to a mof_Player object.
+ * @param map     Pointer to a mof_Map object.
+ */
+mof_Raycaster__draw3D(mof_Player *player, mof_Map *map)
+{
+  double *resultH, *resultV, *result;
+  double i = 0;
+  double distanceFromProjectionPlane = (640 / 2) / tan((60 / 2) * M_PI / 180);
+  int bottom, top, position = 0;
+  double orientation = 0;
+  
+  boxRGBA(player->screen, 0, 0, 640, 240, 106, 106, 106, 255);
+  boxRGBA(player->screen, 0, 240, 640, 480, 40, 40, 40, 255);
+  
+  for (i = 30; i >= -30; i -= 0.9375)
+  {
+    resultH = mof_Raycaster__horizontal(player, map, 180 - (double)((mof_Avatar *)player)->angle + i);
+	resultV = mof_Raycaster__vertical(player, map, 180 - (double)((mof_Avatar *)player)->angle + i);
+	
+	if (resultH[0] < 0)
+	{
+	  orientation = (fabs(resultH[0] - resultV[0]) < 15) ? orientation : 1;		/* just a stupid 'hack' to get better 3D */
+	  result = resultV;
+	}
+	else if (resultV[0] < 0)
+	{
+	  orientation = (fabs(resultH[0] - resultV[0]) < 15) ? orientation : 0;
+	  result = resultH;
+	}
+	else if (resultH[0] < resultV[0])
+	{
+	  orientation = (fabs(resultH[0] - resultV[0]) < 15) ? orientation : 0;
+	  result = resultH;
+	}
+	else
+	{
+	  orientation = (fabs(resultH[0] - resultV[0]) < 15) ? orientation : 1;
+	  result = resultV;
+	}
+	
+	/* remove the viewing distortion */
+    result[0] = result[0] * fabs(cos(i * M_PI / 180));
+	
+	/* get top and bottom of wall */
+	bottom = (int)floor(32 * distanceFromProjectionPlane / result[0] + 240);
+    top = (int)floor((32 - 64) * distanceFromProjectionPlane / result[0] + 240);
+
+	/* draw wall slice */
+	if (orientation)
+	  boxRGBA(player->screen, position, top, position + 9, bottom, 185 - (result[0] * 0.2), 0, 0, 255);	
+	else
+	  boxRGBA(player->screen, position, top, position + 9, bottom, 255 - (result[0] * 0.2), 0, 0, 255);
+	
+	position += 10;
   }
 }
 
