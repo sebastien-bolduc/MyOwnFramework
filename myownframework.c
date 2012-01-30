@@ -33,6 +33,8 @@ mof_Map *level = NULL;
 mof_Time *timer = NULL;
 
 char test[100] = {"/0"};
+int mapflag = 0;
+int release_m = 1;
 
 /**
  * Initialization.
@@ -122,6 +124,19 @@ void mof__update(int *running_loop)
   {
 	mof_Player__movebackward(player, level);
   }
+  
+  if (mof_Keyboard__checkkey(SDLK_m))
+  {
+	if (release_m)
+	{
+	  mapflag = (mapflag) ? 0 : 1;
+	  release_m = 0;
+	}
+  }
+  else 
+  {
+	release_m = 1;
+  }
 }
 
 /**
@@ -135,7 +150,7 @@ void mof__draw()
   int offsetX = mof_Player__offsetX(player, level, 320);
   int offsetY = mof_Player__offsetY(player, level, 240);
   
-  if (mof_Keyboard__checkkey(SDLK_m))
+  if (mapflag)
   {
 	mof_Map__draw(level, offsetX, offsetY);
     mof_Player__draw(player, offsetX, offsetY);
