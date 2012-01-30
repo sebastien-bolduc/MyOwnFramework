@@ -47,7 +47,11 @@ int mof_Raycaster__limit(mof_Map *map, double x, double y)
 double *mof_Raycaster__horizontal(mof_Player *player, mof_Map *map, double angle)
 {
   static double resultH[3] = {0, 0, 0};	
-	
+
+  /* escaping the case that screw thing up! */
+  if (angle == 135)
+	angle += 0.5;
+
   if (angle == 0 || angle == 180)
   {
 	resultH[0] = -1;
@@ -141,6 +145,10 @@ double *mof_Raycaster__vertical(mof_Player *player, mof_Map *map, double angle)
 {
   static double resultV[3] = {0, 0, 0};	
   
+  /* escaping the case that screw thing up! */
+  if (angle == 135)
+	angle += 0.5;
+  
   if (angle == 90 || angle == 270)
   {
 	resultV[0] = -1;
@@ -195,7 +203,7 @@ double *mof_Raycaster__vertical(mof_Player *player, mof_Map *map, double angle)
 	Ya = (map->unit * tan(angle * M_PI / 180));
   else
 	Ya = -((map->unit * tan(angle * M_PI / 180)));
-	
+
   /* check the grid at the intersection point for wall */
   while (map->map[(int)(((flag) ? floor((Xnew - 1) / map->unit) : floor(Xnew / map->unit)) + floor(Ynew / map->unit) * map->width)] != 1)
   {   
