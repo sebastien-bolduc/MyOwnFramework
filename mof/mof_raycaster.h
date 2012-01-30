@@ -1,6 +1,6 @@
 /**
  * @author Sebastien Bolduc <sebastien.bolduc@gmail.com>
- * @version 1.20
+ * @version 1.30
  * @since 2012-01-24
  */
 
@@ -65,19 +65,23 @@ double *mof_Raycaster__horizontal(mof_Player *player, mof_Map *map, double angle
   double Py = 0;
   double Xnew = 0;
   double Ynew = 0;
+  int flag = 0;
   
   Px = ((mof_Avatar *)player)->x;
   Py = ((mof_Avatar *)player)->y;
   
   if (angle >= 0 && angle <= 180)
-	Ynew = floor(Py / map->unit) * map->unit - 1;
+  {
+	Ynew = floor(Py / map->unit) * map->unit;// - 1;
+	flag = 1;											/* correct 'hack' for wall orientation */
+  }
   else
 	Ynew = floor(Py / map->unit) * map->unit + map->unit;
     
   if (angle == 90 || angle == 270)
     Xnew = Px;
   else
-	Xnew = floor(Px + ((Py - Ynew) / tan(angle * M_PI / 180)));
+	Xnew = (Px + ((Py - Ynew) / tan(angle * M_PI / 180)));
 	
   /* checking to see if we are not out of bound */
   if (mof_Raycaster__limit(map, Xnew, Ynew))
@@ -99,21 +103,13 @@ double *mof_Raycaster__horizontal(mof_Player *player, mof_Map *map, double angle
     
   if (angle == 90 || angle == 270)
 	Xa = 0;
-  else if (angle >= 0 && angle < 90)				/* correction for ray to not cross wall */
-	Xa = ceil(map->unit / tan(angle * M_PI / 180));
-  else if (angle >= 90 && angle < 180)
-	Xa = floor(map->unit / tan(angle * M_PI / 180));
-  else if (angle >= 180 && angle < 270)
-	Xa = -(ceil(map->unit / tan(angle * M_PI / 180)));
-  else if (angle >= 270 && angle < 360)
-	Xa = -(floor(map->unit / tan(angle * M_PI / 180)));
-  /*else if (angle > 180)
-	Xa = -(floor(map->unit / tan(angle * M_PI / 180)));
+  else if (angle > 180)
+	Xa = -((map->unit / tan(angle * M_PI / 180)));
   else
-	Xa = floor(map->unit / tan(angle * M_PI / 180));*/
-	
+	Xa = (map->unit / tan(angle * M_PI / 180));
+
   /* check the grid at the intersection point for wall */
-  while (map->map[(int)(floor(Xnew / map->unit) + floor(Ynew / map->unit) * map->width)] != 1)
+  while (map->map[(int)(floor(Xnew / map->unit) + ((flag) ? floor((Ynew - 1) / map->unit) : floor(Ynew / map->unit)) * map->width)] != 1)
   {   
 	Ynew += Ya;
 	Xnew += Xa;
@@ -162,16 +158,20 @@ double *mof_Raycaster__vertical(mof_Player *player, mof_Map *map, double angle)
   double Py = 0;
   double Xnew = 0;
   double Ynew = 0;
+  int flag = 0;
   
   Px = ((mof_Avatar *)player)->x;
   Py = ((mof_Avatar *)player)->y;
   
   if (angle > 90 && angle < 270)
-	Xnew = floor(Px / map->unit) * map->unit - 1;
+  {
+	Xnew = floor(Px / map->unit) * map->unit;// - 1;
+	flag = 1;											/* correct 'hack' for wall orientation */
+  }
   else
 	Xnew = floor(Px / map->unit) * map->unit + map->unit;
     
-  Ynew = floor(Py + ((Px - Xnew) * tan(angle * M_PI / 180)));
+  Ynew = (Py + ((Px - Xnew) * tan(angle * M_PI / 180)));
   
   /* checking to see if we are not out of bound */
   if (mof_Raycaster__limit(map, Xnew, Ynew))
@@ -191,21 +191,13 @@ double *mof_Raycaster__vertical(mof_Player *player, mof_Map *map, double angle)
   /* find Ya */
   double Ya = 0;
   
-  if (angle >= 0 && angle < 90)						/* correction for ray to not cross wall */
-	Ya = -(ceil(map->unit * tan(angle * M_PI / 180)));
-  else if (angle >= 90 && angle < 180)
-	Ya = floor(map->unit * tan(angle * M_PI / 180));
-  else if (angle >= 180 && angle < 270)
-	Ya = ceil(map->unit * tan(angle * M_PI / 180));
-  else if (angle >= 270 && angle < 360)
-	Ya = -(floor(map->unit * tan(angle * M_PI / 180)));
-  /*if (angle > 90 && angle < 270)
-	Ya = floor(map->unit * tan(angle * M_PI / 180));
+  if (angle > 90 && angle < 270)
+	Ya = (map->unit * tan(angle * M_PI / 180));
   else
-	Ya = -(floor(map->unit * tan(angle * M_PI / 180)));*/
+	Ya = -((map->unit * tan(angle * M_PI / 180)));
 	
   /* check the grid at the intersection point for wall */
-  while (map->map[(int)(floor(Xnew / map->unit) + floor(Ynew / map->unit) * map->width)] != 1)
+  while (map->map[(int)(((flag) ? floor((Xnew - 1) / map->unit) : floor(Xnew / map->unit)) + floor(Ynew / map->unit) * map->width)] != 1)
   {   
 	Ynew += Ya;
 	Xnew += Xa;
@@ -219,7 +211,7 @@ double *mof_Raycaster__vertical(mof_Player *player, mof_Map *map, double angle)
   }
   
   resultV[0] = sqrt(pow((Px - Xnew), 2) + pow((Py - Ynew), 2));
-  resultV[1] = Xnew;
+  resultV[1] = Xnew; 
   resultV[2] = Ynew;
   
   return resultV;
@@ -279,23 +271,23 @@ mof_Raycaster__draw3D(mof_Player *player, mof_Map *map)
 	
 	if (resultH[0] < 0)
 	{
-	  orientation = (fabs(resultH[0] - resultV[0]) < 15) ? orientation : 1;		/* just a stupid 'hack' to get better 3D */
 	  result = resultV;
+	  orientation = 1;
 	}
 	else if (resultV[0] < 0)
 	{
-	  orientation = (fabs(resultH[0] - resultV[0]) < 15) ? orientation : 0;
 	  result = resultH;
+	  orientation = 0;
 	}
 	else if (resultH[0] < resultV[0])
 	{
-	  orientation = (fabs(resultH[0] - resultV[0]) < 15) ? orientation : 0;
 	  result = resultH;
+	  orientation = 0;
 	}
 	else
 	{
-	  orientation = (fabs(resultH[0] - resultV[0]) < 15) ? orientation : 1;
 	  result = resultV;
+	  orientation = 1;
 	}
 	
 	/* remove the viewing distortion */
