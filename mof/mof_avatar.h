@@ -108,7 +108,7 @@ void mof_Avatar__moveforward(mof_Avatar *avatar)
   mof_Avatar__check(avatar);	
 	
   /* don't forget to convert degree to rad */
-  avatar->x -= (cos(avatar->angle * M_PI / 180) * 1);
+  avatar->x += (cos(avatar->angle * M_PI / 180) * 1);
   avatar->y -= (sin(avatar->angle * M_PI / 180) * 1);
 }
 
@@ -123,7 +123,7 @@ void mof_Avatar__movebackward(mof_Avatar *avatar)
   mof_Avatar__check(avatar);	
 
   /* don't forget to convert degree to rad */
-  avatar->x += (cos(avatar->angle * M_PI / 180) * 1);
+  avatar->x -= (cos(avatar->angle * M_PI / 180) * 1);
   avatar->y += (sin(avatar->angle * M_PI / 180) * 1);
 }
 
@@ -139,7 +139,7 @@ void mof_Avatar__moveleft(mof_Avatar *avatar)
 	
   /* don't forget to convert degree to rad */
   avatar->x += (cos((avatar->angle + 90) * M_PI / 180) * 1);
-  avatar->y += (sin((avatar->angle + 90) * M_PI / 180) * 1);
+  avatar->y -= (sin((avatar->angle + 90) * M_PI / 180) * 1);
 }
 
 /**
@@ -154,7 +154,7 @@ void mof_Avatar__moveright(mof_Avatar *avatar)
 	
   /* don't forget to convert degree to rad */
   avatar->x += (cos((avatar->angle - 90) * M_PI / 180) * 1);
-  avatar->y += (sin((avatar->angle - 90) * M_PI / 180) * 1);
+  avatar->y -= (sin((avatar->angle - 90) * M_PI / 180) * 1);
 }
 
 /**

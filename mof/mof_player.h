@@ -18,7 +18,7 @@
 #define MOF_PLAYER_TYPE (1<<5)		/* dynamic type checking */
 
 /**
- * mof_Avatar class.
+ * mof_Player class.
  */ 
 typedef struct {
   mof_Avatar parent;
@@ -76,7 +76,7 @@ mof_Player *mof_Player__new(SDL_Surface *screen, double x, double y, int angle)
  */
 void mof_Player__check(mof_Player *player)
 {
-  /* check if we have a valid mof_Avatar object */
+  /* check if we have a valid mof_Player object */
   if (player == NULL || 
 	  !(((mof_Avatar *)player)->type & MOF_PLAYER_TYPE))
   {
@@ -127,7 +127,7 @@ void mof_Player__moveforward(mof_Player *player, mof_Map *level)
 		  
 	  /* resolve collision */
 	  mof_Avatar__movebackward(((mof_Avatar *)player));
-	  ((mof_Avatar *)player)->x -= (cos(((mof_Avatar *)player)->angle * M_PI / 180) * 1);
+	  ((mof_Avatar *)player)->x += (cos(((mof_Avatar *)player)->angle * M_PI / 180) * 1);
 	  mof_Collisionbox__move(player->collision, (int)((mof_Avatar *)player)->x - 10, (int)((mof_Avatar *)player)->y - 10);
 	  bkup = level->collision->current;
 	  for (level->collision->current = level->collision->first->next; level->collision->current != NULL; level->collision->current = level->collision->current->next)
@@ -141,7 +141,7 @@ void mof_Player__moveforward(mof_Player *player, mof_Map *level)
 	  if (flag)
 	  {
 		flag = 0;
-		((mof_Avatar *)player)->x += (cos(((mof_Avatar *)player)->angle * M_PI / 180) * 1);
+		((mof_Avatar *)player)->x -= (cos(((mof_Avatar *)player)->angle * M_PI / 180) * 1);
 		((mof_Avatar *)player)->y -= (sin(((mof_Avatar *)player)->angle * M_PI / 180) * 1);
 		mof_Collisionbox__move(player->collision, (int)((mof_Avatar *)player)->x - 10, (int)((mof_Avatar *)player)->y - 10);
 		for (level->collision->current = level->collision->first->next; level->collision->current != NULL; level->collision->current = level->collision->current->next)
@@ -193,7 +193,7 @@ void mof_Player__movebackward(mof_Player *player, mof_Map *level)
 		  
 	  /* resolve collision */
 	  mof_Avatar__moveforward(((mof_Avatar *)player));
-	  ((mof_Avatar *)player)->x += (cos(((mof_Avatar *)player)->angle * M_PI / 180) * 1);
+	  ((mof_Avatar *)player)->x -= (cos(((mof_Avatar *)player)->angle * M_PI / 180) * 1);
 	  mof_Collisionbox__move(player->collision, (int)((mof_Avatar *)player)->x - 10, (int)((mof_Avatar *)player)->y - 10);
 	  bkup = level->collision->current;
 	  for (level->collision->current = level->collision->first->next; level->collision->current != NULL; level->collision->current = level->collision->current->next)
@@ -207,7 +207,7 @@ void mof_Player__movebackward(mof_Player *player, mof_Map *level)
 	  if (flag)
 	  {
 		flag = 0;
-		((mof_Avatar *)player)->x -= (cos(((mof_Avatar *)player)->angle * M_PI / 180) * 1);
+		((mof_Avatar *)player)->x += (cos(((mof_Avatar *)player)->angle * M_PI / 180) * 1);
 		((mof_Avatar *)player)->y += (sin(((mof_Avatar *)player)->angle * M_PI / 180) * 1);
 		mof_Collisionbox__move(player->collision, (int)((mof_Avatar *)player)->x - 10, (int)((mof_Avatar *)player)->y - 10);
 		for (level->collision->current = level->collision->first->next; level->collision->current != NULL; level->collision->current = level->collision->current->next)
@@ -274,7 +274,7 @@ void mof_Player__moveleft(mof_Player *player, mof_Map *level)
 	  {
 		flag = 0;
 		((mof_Avatar *)player)->x -= (cos((((mof_Avatar *)player)->angle + 90) * M_PI / 180) * 1);
-		((mof_Avatar *)player)->y += (sin((((mof_Avatar *)player)->angle + 90) * M_PI / 180) * 1);
+		((mof_Avatar *)player)->y -= (sin((((mof_Avatar *)player)->angle + 90) * M_PI / 180) * 1);
 		mof_Collisionbox__move(player->collision, (int)((mof_Avatar *)player)->x - 10, (int)((mof_Avatar *)player)->y - 10);
 		for (level->collision->current = level->collision->first->next; level->collision->current != NULL; level->collision->current = level->collision->current->next)
 		{	  
@@ -288,7 +288,7 @@ void mof_Player__moveleft(mof_Player *player, mof_Map *level)
 	  if (flag)
 	  {
 		flag = 0;
-		((mof_Avatar *)player)->y -= (sin((((mof_Avatar *)player)->angle + 90) * M_PI / 180) * 1);
+		((mof_Avatar *)player)->y += (sin((((mof_Avatar *)player)->angle + 90) * M_PI / 180) * 1);
 		mof_Collisionbox__move(player->collision, (int)((mof_Avatar *)player)->x - 10, (int)((mof_Avatar *)player)->y - 10);	
 	  }
 		
@@ -340,7 +340,7 @@ void mof_Player__moveright(mof_Player *player, mof_Map *level)
 	  {
 		flag = 0;
 		((mof_Avatar *)player)->x -= (cos((((mof_Avatar *)player)->angle - 90) * M_PI / 180) * 1);
-		((mof_Avatar *)player)->y += (sin((((mof_Avatar *)player)->angle - 90) * M_PI / 180) * 1);
+		((mof_Avatar *)player)->y -= (sin((((mof_Avatar *)player)->angle - 90) * M_PI / 180) * 1);
 		mof_Collisionbox__move(player->collision, (int)((mof_Avatar *)player)->x - 10, (int)((mof_Avatar *)player)->y - 10);
 		for (level->collision->current = level->collision->first->next; level->collision->current != NULL; level->collision->current = level->collision->current->next)
 		{	  
@@ -354,7 +354,7 @@ void mof_Player__moveright(mof_Player *player, mof_Map *level)
 	  if (flag)
 	  {
 		flag = 0;
-		((mof_Avatar *)player)->y -= (sin((((mof_Avatar *)player)->angle - 90) * M_PI / 180) * 1);
+		((mof_Avatar *)player)->y += (sin((((mof_Avatar *)player)->angle - 90) * M_PI / 180) * 1);
 		mof_Collisionbox__move(player->collision, (int)((mof_Avatar *)player)->x - 10, (int)((mof_Avatar *)player)->y - 10);	
 	  }
 		
@@ -376,7 +376,7 @@ void mof_Player__moveright(mof_Player *player, mof_Map *level)
  */
 int mof_Player__offsetX(mof_Player *player, mof_Map *map, int limit)
 {
-  int max_offset = (map->width * map->unit)  - player->screen->w;
+  int max_offset = (map->width * map->unit) - player->screen->w;
   int offset = ((mof_Avatar *)player)->x - limit;
   
   if (max_offset < 0)
@@ -400,7 +400,7 @@ int mof_Player__offsetX(mof_Player *player, mof_Map *map, int limit)
  */
 int mof_Player__offsetY(mof_Player *player, mof_Map *map, int limit)
 {
-  int max_offset = (map->height * map->unit)  - player->screen->h;
+  int max_offset = (map->height * map->unit) - player->screen->h;
   int offset = ((mof_Avatar *)player)->y - limit;
   
   if (max_offset < 0)
@@ -427,11 +427,11 @@ void mof_Player__draw(mof_Player *player, int offsetX, int offsetY)
   mof_Player__check(player);
   
   filledEllipseRGBA(player->screen, ((mof_Avatar *)player)->x - offsetX, ((mof_Avatar *)player)->y - offsetY, 10, 10, 255, 0, 0, 255);
-  int lineX = ((mof_Avatar *)player)->x - offsetX - (int)(cos((double)((mof_Avatar *)player)->angle * M_PI / 180) * 20);
+  int lineX = ((mof_Avatar *)player)->x - offsetX + (int)(cos((double)((mof_Avatar *)player)->angle * M_PI / 180) * 20);
   int lineY = ((mof_Avatar *)player)->y - offsetY - (int)(sin((double)((mof_Avatar *)player)->angle * M_PI / 180) * 20);
-  int arrow1X = ((mof_Avatar *)player)->x - offsetX - (int)(cos((double)(((mof_Avatar *)player)->angle + 30) * M_PI / 180) * 14);
+  int arrow1X = ((mof_Avatar *)player)->x - offsetX + (int)(cos((double)(((mof_Avatar *)player)->angle + 30) * M_PI / 180) * 14);
   int arrow1Y = ((mof_Avatar *)player)->y - offsetY - (int)(sin((double)(((mof_Avatar *)player)->angle + 30) * M_PI / 180) * 14);
-  int arrow2X = ((mof_Avatar *)player)->x - offsetX - (int)(cos((double)(((mof_Avatar *)player)->angle - 30) * M_PI / 180) * 14);
+  int arrow2X = ((mof_Avatar *)player)->x - offsetX + (int)(cos((double)(((mof_Avatar *)player)->angle - 30) * M_PI / 180) * 14);
   int arrow2Y = ((mof_Avatar *)player)->y - offsetY - (int)(sin((double)(((mof_Avatar *)player)->angle - 30) * M_PI / 180) * 14); 
   lineRGBA(player->screen, (int)((mof_Avatar *)player)->x - offsetX, (int)((mof_Avatar *)player)->y - offsetY, lineX, lineY, 0, 255, 0, 255);
   lineRGBA(player->screen, arrow1X, arrow1Y, lineX, lineY, 0, 255, 0, 255);

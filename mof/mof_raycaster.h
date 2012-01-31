@@ -239,8 +239,8 @@ mof_Raycaster__draw(mof_Player *player, mof_Map *map, int offsetX, int offsetY)
   double i = 0;
   for (i = 30; i >= -30; i -= 0.9375)
   {
-    resultH = mof_Raycaster__horizontal(player, map, 180 - (double)((mof_Avatar *)player)->angle + i);
-	resultV = mof_Raycaster__vertical(player, map, 180 - (double)((mof_Avatar *)player)->angle + i);
+    resultH = mof_Raycaster__horizontal(player, map, (double)((mof_Avatar *)player)->angle + i);
+	resultV = mof_Raycaster__vertical(player, map, (double)((mof_Avatar *)player)->angle + i);
 	
 	if (resultH[0] < 0)
 	  result = resultV;
@@ -274,8 +274,8 @@ mof_Raycaster__draw3D(mof_Player *player, mof_Map *map)
   
   for (i = 30; i >= -30; i -= 0.9375)
   {
-    resultH = mof_Raycaster__horizontal(player, map, 180 - (double)((mof_Avatar *)player)->angle + i);
-	resultV = mof_Raycaster__vertical(player, map, 180 - (double)((mof_Avatar *)player)->angle + i);
+    resultH = mof_Raycaster__horizontal(player, map, (double)((mof_Avatar *)player)->angle + i);
+	resultV = mof_Raycaster__vertical(player, map, (double)((mof_Avatar *)player)->angle + i);
 	
 	if (resultH[0] < 0)
 	{
