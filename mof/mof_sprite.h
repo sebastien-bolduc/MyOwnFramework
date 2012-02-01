@@ -127,7 +127,9 @@ void mof_Sprite__draw(mof_Sprite *sprite, mof_Player *player)
 	angle = 360 - fabs(atan(opp / adj)) * 180 / M_PI;
 
   /* fuck this (working finally) */
-  angle = (fabs(angle - (double)((mof_Avatar *)player)->angle) > 30) ? (360 - fabs(angle - (double)((mof_Avatar *)player)->angle)) : (angle - (double)((mof_Avatar *)player)->angle);
+  angle = (fabs(angle - (double)((mof_Avatar *)player)->angle) > 90) ? 
+		  ((angle > (double)((mof_Avatar *)player)->angle) ? -(360 - fabs(angle - (double)((mof_Avatar *)player)->angle)) : (360 - fabs(angle - (double)((mof_Avatar *)player)->angle))) : 
+		  (angle - (double)((mof_Avatar *)player)->angle);
   
   /* distance from player */
   double Sx = ((mof_Avatar *)sprite)->x;
@@ -141,8 +143,12 @@ void mof_Sprite__draw(mof_Sprite *sprite, mof_Player *player)
   int top = (int)floor((-10) * distanceFromProjectionPlane / distance + 240);
   double ratio = (double)(bottom - top) / 20;
   
-  if (fabs(angle) <= 30)
-    boxRGBA(sprite->screen, 320 - (int)(10 * ratio), top, 320 + (int)(10 * ratio), bottom, 0, 0, 255, 255);
+  int Ps = 0;
+  //if (fabs(angle) <= 30)
+  //{
+	Ps = -floor(320 * angle / 30);
+    boxRGBA(sprite->screen, 320 - (int)(10 * ratio) + Ps, top, 320 + (int)(10 * ratio) + Ps, bottom, 0, 0, 255, 255);
+  //}
 }
 
 #endif
