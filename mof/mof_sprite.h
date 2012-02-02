@@ -99,9 +99,23 @@ void mof_Sprite__destroy(mof_Sprite *sprite)
  * Drawing sprite.
  * 
  * @param sprite Pointer to a mof_Sprite object.
- * @param player Pointer to a mof_Player object.
+ * @param offsetX Offset for the X coordinate.
+ * @param offsetY Offset for the Y coordinate.
  */
-void mof_Sprite__draw(mof_Sprite *sprite, mof_Player *player)
+void mof_Sprite__draw(mof_Sprite *sprite, int offsetX, int offsetY)
+{
+  boxRGBA(sprite->screen, ((mof_Avatar *)sprite)->x - 5 - offsetX, ((mof_Avatar *)sprite)->y - 5 - offsetY, 
+						  ((mof_Avatar *)sprite)->x + 5 - offsetX, ((mof_Avatar *)sprite)->y + 5 - offsetY, 0, 255, 0, 255);
+}
+
+/**
+ * Drawing sprite (3D).
+ * 
+ * @param sprite Pointer to a mof_Sprite object.
+ * @param player Pointer to a mof_Player object.
+ * @param map    Pointer to a mof_Map object.
+ */
+void mof_Sprite__draw3D(mof_Sprite *sprite, mof_Player *player, mof_Map *map)
 {
   /* check if we have a valid mof_Sprite object */
   mof_Sprite__check(sprite);
@@ -147,8 +161,10 @@ void mof_Sprite__draw(mof_Sprite *sprite, mof_Player *player)
   //if (fabs(angle) <= 30)
   //{
 	Ps = -floor(320 * angle / 30);
-    boxRGBA(sprite->screen, 320 - (int)(10 * ratio) + Ps, top, 320 + (int)(10 * ratio) + Ps, bottom, 0, 0, 255, 255);
+    boxRGBA(sprite->screen, 320 - (int)(10 * ratio) + Ps, top, 320 + (int)(10 * ratio) + Ps, bottom, 0, 255, 0, 255);
   //}
+  
+  mof_Raycaster__draw3Dmask(player, map, distance);
 }
 
 #endif

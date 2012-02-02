@@ -55,7 +55,7 @@ void mof__init()
   
   level = mof_Map__new(screen);
   player = mof_Player__new(screen, 320, 320, 90);
-  sprite = mof_Sprite__new(screen, 320, 96);
+  sprite = mof_Sprite__new(screen, 320, 320);
   text = mof_Font__new(screen, WINDOW_FONT);
   timer = mof_Time__new(); 
 }
@@ -156,13 +156,14 @@ void mof__draw()
   if (mapflag)
   {
 	mof_Map__draw(level, offsetX, offsetY);
+	mof_Sprite__draw(sprite, offsetX, offsetY);
     mof_Player__draw(player, offsetX, offsetY);
     mof_Raycaster__draw(player, level, offsetX, offsetY);
   }
   else 
   {
     mof_Raycaster__draw3D(player, level);
-	mof_Sprite__draw(sprite, player);
+	mof_Sprite__draw3D(sprite, player, level);
   }
 }
 
@@ -187,7 +188,7 @@ int main(int argc, char **argv)
       mof__draw();
 	  
 	  /* print to bottom of screen */
-	  sprintf(test, "(elapsed %d) milli: %3.3lld -- micro: %6.6lld", ((mof_Avatar *)player)->angle, mof_Time__gettime_elapsed_msec(timer), mof_Time__gettime_elapsed_usec(timer));
+	  sprintf(test, "(elapsed) milli: %3.3lld -- micro: %6.6lld", mof_Time__gettime_elapsed_msec(timer), mof_Time__gettime_elapsed_usec(timer));
 	  mof_Font__printf(text, test, 20, screen->h - 40);
 	  
 	  SDL_Delay(1);
