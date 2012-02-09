@@ -128,7 +128,7 @@ void mof_Collisionbox__destroy(mof_Collisionbox *collisionbox)
  * @param width  Width of collision box.
  * @param height Height of collision box.
  */
-mof_Collisionbox__add(mof_Collisionbox *first, int x, int y, int width, int height)
+void mof_Collisionbox__add(mof_Collisionbox *first, int x, int y, int width, int height)
 {
   /* check if we have a valid mof_Collisionbox object */
   mof_Collisionbox__check(first);

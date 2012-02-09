@@ -13,6 +13,7 @@
 
 #include "mof/mof_collisionbox.h"
 #include "mof/mof_font.h"
+#include "mof/mof_graphicelement.h"
 #include "mof/mof_keyboard.h"
 #include "mof/mof_map.h"
 #include "mof/mof_player.h"
@@ -29,9 +30,13 @@ const char *WINDOW_TITLE = "My Own Framework";
 const char *WINDOW_FONT = "/home/user/Downloads/arial.ttf";
 
 mof_Font *text = NULL;
+mof_Graphicelement *scene = NULL;
 mof_Map *level = NULL;
 mof_Player *player = NULL;
-mof_Sprite *sprite = NULL;
+mof_Sprite *sprite1 = NULL;
+mof_Sprite *sprite2 = NULL;
+mof_Sprite *sprite3 = NULL;
+mof_Sprite *sprite4 = NULL;
 mof_Time *timer = NULL;
 
 char test[100] = {"/0"};
@@ -55,7 +60,11 @@ void mof__init()
   
   level = mof_Map__new(screen);
   player = mof_Player__new(screen, 320, 320, 90);
-  sprite = mof_Sprite__new(screen, 320, 320);
+  scene = mof_Graphicelement__new(-1.0, 0, 0, 0 , 0, 0, 0, 0, 0);
+  sprite1 = mof_Sprite__new(screen, 320, 320);
+  sprite2 = mof_Sprite__new(screen, 320, 96);
+  sprite3 = mof_Sprite__new(screen, 672, 320);
+  sprite4 = mof_Sprite__new(screen, 96, 534);
   text = mof_Font__new(screen, WINDOW_FONT);
   timer = mof_Time__new(); 
 }
@@ -156,14 +165,21 @@ void mof__draw()
   if (mapflag)
   {
 	mof_Map__draw(level, offsetX, offsetY);
-	mof_Sprite__draw(sprite, offsetX, offsetY);
+	mof_Sprite__draw(sprite1, offsetX, offsetY);
+	mof_Sprite__draw(sprite2, offsetX, offsetY);
+	mof_Sprite__draw(sprite3, offsetX, offsetY);
+	mof_Sprite__draw(sprite4, offsetX, offsetY);
     mof_Player__draw(player, offsetX, offsetY);
     mof_Raycaster__draw(player, level, offsetX, offsetY);
   }
   else 
   {
-    mof_Raycaster__draw3D(player, level);
-	mof_Sprite__draw3D(sprite, player, level);
+    mof_Raycaster__draw3Dscene(scene, player, level);
+	mof_Sprite__draw3Dscene(scene, sprite1, player);
+	mof_Sprite__draw3Dscene(scene, sprite2, player);
+	mof_Sprite__draw3Dscene(scene, sprite3, player);
+	mof_Sprite__draw3Dscene(scene, sprite4, player);
+	mof_Graphicelement__render(screen, scene);
   }
 }
 
@@ -203,9 +219,13 @@ int main(int argc, char **argv)
   }
 
   mof_Font__destroy(text);
+  mof_Graphicelement__destroy(scene);
   mof_Map__destroy(level);
   mof_Player__destroy(player);
-  mof_Sprite__destroy(sprite);
+  mof_Sprite__destroy(sprite1);
+  mof_Sprite__destroy(sprite2);
+  mof_Sprite__destroy(sprite3);
+  mof_Sprite__destroy(sprite4);
   mof_Time__destroy(timer);
   SDL_Quit();
 

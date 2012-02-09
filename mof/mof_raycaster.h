@@ -6,6 +6,7 @@
 
 #include <math.h>
 
+#include "mof_graphicelement.h"
 #include "mof_player.h"
 #include "mof_map.h"
 
@@ -370,6 +371,71 @@ mof_Raycaster__draw3Dmask(mof_Player *player, mof_Map *map, double sprite_distan
 	  else
 	    boxRGBA(player->screen, position, top, position + 9, bottom, 255 - (result[0] * 0.2), 0, 0, 255);
 	}
+	
+	position += 10;
+  }
+}
+
+/**
+ * Drawing the rays casted (3D).
+ * 
+ * @param scene  Pointer to a mof_Graphicelement object.
+ * @param player Pointer to a mof_Player object.
+ * @param map    Pointer to a mof_Map object.
+ */
+mof_Raycaster__draw3Dscene(mof_Graphicelement *scene, mof_Player *player, mof_Map *map)
+{
+  double *resultH, *resultV, *result;
+  double i = 0;
+  double distanceFromProjectionPlane = (640 / 2) / tan((60 / 2) * M_PI / 180);
+  int bottom, top, position = 0;
+  double orientation = 0;
+  double zIndex = 0;
+  
+  mof_Graphicelement__add(scene, 10000.0, 0, 0, 640, 240, 106, 106, 106, 255);
+  mof_Graphicelement__add(scene, 10000.0, 0, 240, 640, 480, 40, 40, 40 ,255);
+  
+  for (i = 30; i >= -30; i -= 0.9375)
+  {
+    resultH = mof_Raycaster__horizontal(player, map, (double)((mof_Avatar *)player)->angle + i);
+	resultV = mof_Raycaster__vertical(player, map, (double)((mof_Avatar *)player)->angle + i);
+	
+	if (resultH[0] < 0)
+	{
+	  result = resultV;
+	  orientation = 1;
+	}
+	else if (resultV[0] < 0)
+	{
+	  result = resultH;
+	  orientation = 0;
+	}
+	else if (resultH[0] < resultV[0])
+	{
+	  result = resultH;
+	  orientation = 0;
+	}
+	else
+	{
+	  result = resultV;
+	  orientation = 1;
+	}
+	
+	/* Z-buffering */
+	zIndex = result[0];
+	
+	/* remove the viewing distortion */
+    result[0] = result[0] * fabs(cos(i * M_PI / 180));
+	
+	/* get top and bottom of wall */
+	bottom = (int)floor(32 * distanceFromProjectionPlane / result[0] + 240);
+    top = (int)floor((32 - 64) * distanceFromProjectionPlane / result[0] + 240);
+
+	/* draw wall slice */
+	if (orientation)
+	  mof_Graphicelement__add(scene, zIndex, position, top, 9, (bottom - top), 185 - (result[0] * 0.2), 0, 0, 255);
+	else
+	  mof_Graphicelement__add(scene, zIndex, position, top, 9, (bottom - top), 255 - (result[0] * 0.2), 0, 0, 255);
 	
 	position += 10;
   }
