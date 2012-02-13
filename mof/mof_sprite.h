@@ -1,6 +1,6 @@
 /**
  * @author Sebastien Bolduc <sebastien.bolduc@gmail.com>
- * @version 0.01
+ * @version 1.10
  * @since 2012-01-31
  */
  
@@ -107,65 +107,6 @@ void mof_Sprite__draw(mof_Sprite *sprite, int offsetX, int offsetY)
 {
   boxRGBA(sprite->screen, ((mof_Avatar *)sprite)->x - 5 - offsetX, ((mof_Avatar *)sprite)->y - 5 - offsetY, 
 						  ((mof_Avatar *)sprite)->x + 5 - offsetX, ((mof_Avatar *)sprite)->y + 5 - offsetY, 0, 255, 0, 255);
-}
-
-/**
- * Drawing sprite (3D).
- * 
- * @param sprite Pointer to a mof_Sprite object.
- * @param player Pointer to a mof_Player object.
- * @param map    Pointer to a mof_Map object.
- */
-void mof_Sprite__draw3D(mof_Sprite *sprite, mof_Player *player, mof_Map *map)
-{
-  /* check if we have a valid mof_Sprite object */
-  mof_Sprite__check(sprite);
-  
-  double distanceFromProjectionPlane = (640 / 2) / tan((60 / 2) * M_PI / 180);
-  
-  /* angle relative to player */
-  double angle;
-  double opp = ((mof_Avatar *)sprite)->y - ((mof_Avatar *)player)->y;
-  double adj = ((mof_Avatar *)sprite)->x - ((mof_Avatar *)player)->x;
-  
-  if (adj == 0 && opp < 0)
-	angle = 90;
-  else if (adj == 0)
-	angle = 270;	
-  else if (adj > 0 && opp <= 0)
-	angle = fabs(atan(opp / adj)) * 180 / M_PI;
-  else if (adj < 0 && opp <= 0)
-	angle = 180 - fabs(atan(opp / adj)) * 180 / M_PI;
-  else if (adj < 0 && opp > 0)
-	angle = 180 + fabs(atan(opp / adj)) * 180 / M_PI;
-  else
-	angle = 360 - fabs(atan(opp / adj)) * 180 / M_PI;
-
-  /* fuck this (working finally) */
-  angle = (fabs(angle - (double)((mof_Avatar *)player)->angle) > 90) ? 
-		  ((angle > (double)((mof_Avatar *)player)->angle) ? -(360 - fabs(angle - (double)((mof_Avatar *)player)->angle)) : (360 - fabs(angle - (double)((mof_Avatar *)player)->angle))) : 
-		  (angle - (double)((mof_Avatar *)player)->angle);
-  
-  /* distance from player */
-  double Sx = ((mof_Avatar *)sprite)->x;
-  double Sy = ((mof_Avatar *)sprite)->y;
-  double Px = ((mof_Avatar *)player)->x;
-  double Py = ((mof_Avatar *)player)->y;
-  double distance = sqrt(pow((Sx - Px), 2) + pow((Sy - Py), 2));
-  
-  /* get top and bottom of sprite */
-  int bottom = (int)floor(10 * distanceFromProjectionPlane / distance + 240);
-  int top = (int)floor((-10) * distanceFromProjectionPlane / distance + 240);
-  double ratio = (double)(bottom - top) / 20;
-  
-  int Ps = 0;
-  //if (fabs(angle) <= 30)
-  //{
-	Ps = -floor(320 * angle / 30);
-    boxRGBA(sprite->screen, 320 - (int)(10 * ratio) + Ps, top, 320 + (int)(10 * ratio) + Ps, bottom, 0, 255, 0, 255);
-  //}
-  
-  mof_Raycaster__draw3Dmask(player, map, distance);
 }
 
 /**

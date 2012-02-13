@@ -1,7 +1,10 @@
 /**
  * @author Sebastien Bolduc <sebastien.bolduc@gmail.com>
- * @version 1.10
+ * @version 1.20
  * @since 2012-01-17
+ * 
+ * This class work as a double linked list for "collision box".  It also provide
+ * some functions for checking and moving "collision box".
  */
 
 #include <assert.h>
@@ -122,16 +125,16 @@ void mof_Collisionbox__destroy(mof_Collisionbox *collisionbox)
  * Add a collision box to the list already existing.  Only the master
  * (the first created collision box) can access this list.
  * 
- * @param first  Pointer to a mof_Collisionbox object.
+ * @param master Pointer to a mof_Collisionbox object.
  * @param x      Coordinate of collision box.
  * @param y      Coordinate of collision box.
  * @param width  Width of collision box.
  * @param height Height of collision box.
  */
-void mof_Collisionbox__add(mof_Collisionbox *first, int x, int y, int width, int height)
+void mof_Collisionbox__add(mof_Collisionbox *master, int x, int y, int width, int height)
 {
   /* check if we have a valid mof_Collisionbox object */
-  mof_Collisionbox__check(first);
+  mof_Collisionbox__check(master);
 	
   mof_Collisionbox *collisionbox = malloc(sizeof(mof_Collisionbox));
   collisionbox->type = MOF_COLLISIONBOX_TYPE;
@@ -142,58 +145,59 @@ void mof_Collisionbox__add(mof_Collisionbox *first, int x, int y, int width, int
   /* set pointer for current element */
   collisionbox->first = NULL;
   collisionbox->last = NULL;
-  collisionbox->previous = first->current;
-  if (first->current->next != NULL)
+  collisionbox->current = NULL;
+  collisionbox->previous = master->current;
+  if (master->current->next != NULL)
   {
-	collisionbox->next = first->current->next;
+	collisionbox->next = master->current->next;
   }
   else 
   {
 	collisionbox->next = NULL;
-	first->last = collisionbox;
+	master->last = collisionbox;
   }
   
   /* set pointer for previous element */
-  first->current->next = collisionbox;
+  master->current->next = collisionbox;
   
   /* set current pointer to newly created element */
-  first->current = collisionbox;
+  master->current = collisionbox;
 }
 
 /**
  * Remove a collision box.
  * 
- * Remove a collision box to the list already existing.  Only the master
- * (the first created collision box) can access this list.
+ * Remove a collision box to the list already existing (the current one).  
+ * Only the master (the first created collision box) can access this list.
  * 
- * @param first Pointer to a mof_Collisionbox object.
+ * @param master Pointer to a mof_Collisionbox object.
  */
-void mof_Collisionbox__remove(mof_Collisionbox *first)
+void mof_Collisionbox__remove(mof_Collisionbox *master)
 { 
   /* check if we have a valid mof_Collisionbox object */
-  mof_Collisionbox__check(first);
+  mof_Collisionbox__check(master);
   
   /* never remove the first element */
-  if (first->current->previous == NULL) 
+  if (master->current->previous == NULL) 
     return;
   
   /* set pointer for previous element */
-  first->current->previous->next = first->current->next;
+  master->current->previous->next = master->current->next;
   
   /* set pointer for next element*/
-  if (first->current->next != NULL)
+  if (master->current->next != NULL)
   {
-    first->current->next->previous = first->current->previous;
+    master->current->next->previous = master->current->previous;
   }
   
   /* set type to 0 indicate this is no longer a mof_Collisionbox object */
-  first->current->type = 0;
+  master->current->type = 0;
   
   /* remove element */
-  mof_Collisionbox *tmp = first->current;
-  mof_Collisionbox *bkup = first->current->previous;
+  mof_Collisionbox *tmp = master->current;
+  mof_Collisionbox *bkup = master->current->previous;
   free(tmp);
-  first->current = bkup;
+  master->current = bkup;
 }
 
 /**
