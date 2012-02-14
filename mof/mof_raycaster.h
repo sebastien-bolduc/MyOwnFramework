@@ -1,6 +1,6 @@
 /**
  * @author Sebastien Bolduc <sebastien.bolduc@gmail.com>
- * @version 1.30
+ * @version 1.40
  * @since 2012-01-24
  * 
  * Raycasting using the method describe at that website:
@@ -53,8 +53,12 @@ double *mof_Raycaster__horizontal(mof_Player *player, mof_Map *map, double angle
   static double resultH[3] = {0, 0, 0};	
 
   /* escaping the case that screw thing up! */
-  if (angle == 135)
-	angle += 0.5;
+  /*if (angle == 135)
+	angle += 0.5;*/
+	
+  /* we push the "ray" just a little farther */
+  double fixX = cos(angle * M_PI / 180) * 0.001;
+  double fixY = -sin(angle * M_PI / 180) * 0.001;
 
   if (angle == 0 || angle == 180)
   {
@@ -117,7 +121,8 @@ double *mof_Raycaster__horizontal(mof_Player *player, mof_Map *map, double angle
 	Xa = (map->unit / tan(angle * M_PI / 180));
 
   /* check the grid at the intersection point for wall */
-  while (map->map[(int)(floor(Xnew / map->unit) + ((flag) ? floor((Ynew - 1) / map->unit) : floor(Ynew / map->unit)) * map->width)] != 1)
+  //while (map->map[(int)(floor(Xnew / map->unit) + ((flag) ? floor((Ynew - 1) / map->unit) : floor(Ynew / map->unit)) * map->width)] != 1)
+  while (map->map[(int)(floor((Xnew + fixX) / map->unit) + floor((Ynew + fixY) / map->unit) * map->width)] != 1)
   {   
 	Ynew += Ya;
 	Xnew += Xa;
@@ -150,8 +155,12 @@ double *mof_Raycaster__vertical(mof_Player *player, mof_Map *map, double angle)
   static double resultV[3] = {0, 0, 0};	
   
   /* escaping the case that screw thing up! */
-  if (angle == 135)
-	angle += 0.5;
+  /*if (angle == 135)
+	angle += 0.5;*/
+
+  /* we push the "ray" just a little farther */
+  double fixX = cos(angle * M_PI / 180) * 0.001;
+  double fixY = -sin(angle * M_PI / 180) * 0.001;
   
   if (angle == 90 || angle == 270)
   {
@@ -209,7 +218,8 @@ double *mof_Raycaster__vertical(mof_Player *player, mof_Map *map, double angle)
 	Ya = -((map->unit * tan(angle * M_PI / 180)));
 
   /* check the grid at the intersection point for wall */
-  while (map->map[(int)(((flag) ? floor((Xnew - 1) / map->unit) : floor(Xnew / map->unit)) + floor(Ynew / map->unit) * map->width)] != 1)
+  //while (map->map[(int)(((flag) ? floor((Xnew - 1) / map->unit) : floor(Xnew / map->unit)) + floor(Ynew / map->unit) * map->width)] != 1)
+  while (map->map[(int)(floor((Xnew + fixX) / map->unit) + floor((Ynew + fixY) / map->unit) * map->width)] != 1)
   {   
 	Ynew += Ya;
 	Xnew += Xa;
