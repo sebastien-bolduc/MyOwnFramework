@@ -53,12 +53,8 @@ double *mof_Raycaster__horizontal(mof_Player *player, mof_Map *map, double angle
   static double resultH[3] = {0, 0, 0};	
 
   /* escaping the case that screw thing up! */
-  /*if (angle == 135)
-	angle += 0.5;*/
-	
-  /* we push the "ray" just a little farther */
-  double fixX = cos(angle * M_PI / 180) * 0.001;
-  double fixY = -sin(angle * M_PI / 180) * 0.001;
+  if (angle == 135)
+	angle += 0.5;
 
   if (angle == 0 || angle == 180)
   {
@@ -121,8 +117,7 @@ double *mof_Raycaster__horizontal(mof_Player *player, mof_Map *map, double angle
 	Xa = (map->unit / tan(angle * M_PI / 180));
 
   /* check the grid at the intersection point for wall */
-  //while (map->map[(int)(floor(Xnew / map->unit) + ((flag) ? floor((Ynew - 1) / map->unit) : floor(Ynew / map->unit)) * map->width)] != 1)
-  while (map->map[(int)(floor((Xnew + fixX) / map->unit) + floor((Ynew + fixY) / map->unit) * map->width)] != 1)
+  while (map->map[(int)(floor(Xnew / map->unit) + ((flag) ? floor((Ynew - 1) / map->unit) : floor(Ynew / map->unit)) * map->width)] != 1)
   {   
 	Ynew += Ya;
 	Xnew += Xa;
@@ -155,12 +150,8 @@ double *mof_Raycaster__vertical(mof_Player *player, mof_Map *map, double angle)
   static double resultV[3] = {0, 0, 0};	
   
   /* escaping the case that screw thing up! */
-  /*if (angle == 135)
-	angle += 0.5;*/
-
-  /* we push the "ray" just a little farther */
-  double fixX = cos(angle * M_PI / 180) * 0.001;
-  double fixY = -sin(angle * M_PI / 180) * 0.001;
+  if (angle == 135)
+	angle += 0.5;
   
   if (angle == 90 || angle == 270)
   {
@@ -218,8 +209,7 @@ double *mof_Raycaster__vertical(mof_Player *player, mof_Map *map, double angle)
 	Ya = -((map->unit * tan(angle * M_PI / 180)));
 
   /* check the grid at the intersection point for wall */
-  //while (map->map[(int)(((flag) ? floor((Xnew - 1) / map->unit) : floor(Xnew / map->unit)) + floor(Ynew / map->unit) * map->width)] != 1)
-  while (map->map[(int)(floor((Xnew + fixX) / map->unit) + floor((Ynew + fixY) / map->unit) * map->width)] != 1)
+  while (map->map[(int)(((flag) ? floor((Xnew - 1) / map->unit) : floor(Xnew / map->unit)) + floor(Ynew / map->unit) * map->width)] != 1)
   {   
 	Ynew += Ya;
 	Xnew += Xa;
@@ -280,15 +270,16 @@ mof_Raycaster__draw3Dscene(mof_Graphicelement *scene, mof_Player *player, mof_Ma
 {
   double *resultH, *resultV, *result;
   double i = 0;
-  double distanceFromProjectionPlane = (640 / 2) / tan((60 / 2) * M_PI / 180);
+  double step = (60.0 / player->screen->w);
+  double distanceFromProjectionPlane = (player->screen->w / 2) / tan((60 / 2) * M_PI / 180);
   int bottom, top, position = 0;
   double orientation = 0;
   double zIndex = 0;
   
-  mof_Graphicelement__add(scene, 10000.0, 0, 0, 640, 240, 106, 106, 106, 255);
-  mof_Graphicelement__add(scene, 10000.0, 0, 240, 640, 480, 40, 40, 40 ,255);
+  mof_Graphicelement__add(scene, 10000.0, 0, 0, player->screen->w, (player->screen->h / 2), 106, 106, 106, 255);
+  mof_Graphicelement__add(scene, 10000.0, 0, (player->screen->h / 2), player->screen->w, player->screen->h, 40, 40, 40 ,255);
   
-  for (i = 30; i >= -30; i -= 0.9375)
+  for (i = 30; i >= -30; i -= step)
   {
     resultH = mof_Raycaster__horizontal(player, map, (double)((mof_Avatar *)player)->angle + i);
 	resultV = mof_Raycaster__vertical(player, map, (double)((mof_Avatar *)player)->angle + i);
@@ -321,16 +312,16 @@ mof_Raycaster__draw3Dscene(mof_Graphicelement *scene, mof_Player *player, mof_Ma
     result[0] = result[0] * fabs(cos(i * M_PI / 180));
 	
 	/* get top and bottom of wall */
-	bottom = (int)floor(32 * distanceFromProjectionPlane / result[0] + 240);
-    top = (int)floor((32 - 64) * distanceFromProjectionPlane / result[0] + 240);
+	bottom = (int)floor(32 * distanceFromProjectionPlane / result[0] + (player->screen->h / 2));
+    top = (int)floor((32 - 64) * distanceFromProjectionPlane / result[0] + (player->screen->h / 2));
 
 	/* draw wall slice */
 	if (orientation)
-	  mof_Graphicelement__add(scene, zIndex, position, top, 9, (bottom - top), 185 - (result[0] * 0.2), 0, 0, 255);
+	  mof_Graphicelement__add(scene, zIndex, position, top, 1, (bottom - top), 185 - (result[0] * 0.2), 0, 0, 255);
 	else
-	  mof_Graphicelement__add(scene, zIndex, position, top, 9, (bottom - top), 255 - (result[0] * 0.2), 0, 0, 255);
+	  mof_Graphicelement__add(scene, zIndex, position, top, 1, (bottom - top), 255 - (result[0] * 0.2), 0, 0, 255);
 	
-	position += 10;
+	position += 1;
   }
 }
 

@@ -90,7 +90,7 @@ void mof__unload()
  */
 void mof__update(int *running_loop)
 {	
-  if (SDL_PollEvent(&event))
+  while (SDL_PollEvent(&event))			/* every event must be poll from the queue... */
   {
 	/* handling the SDL window */
 	if (event.type == SDL_QUIT)
@@ -118,6 +118,9 @@ void mof__update(int *running_loop)
 	/* handling the keyboard (game-type input) */
 	mof_Keyboard__pollevent(&event);
   }
+   
+  /* emptying the event queue */		/* ..or do this to take care of the remaining events */
+  //while (SDL_PollEvent(&event)) {}
   
   /* taking care of the keyboard (game-type input) */
   if (mof_Keyboard__checkkey(SDLK_LEFT))

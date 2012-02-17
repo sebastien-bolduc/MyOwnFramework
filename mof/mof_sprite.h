@@ -121,7 +121,7 @@ void mof_Sprite__draw3Dscene(mof_Graphicelement *scene, mof_Sprite *sprite, mof_
   /* check if we have a valid mof_Sprite object */
   mof_Sprite__check(sprite);
   
-  double distanceFromProjectionPlane = (640 / 2) / tan((60 / 2) * M_PI / 180);
+  double distanceFromProjectionPlane = (player->screen->w / 2) / tan((60 / 2) * M_PI / 180);
   
   /* angle relative to player */
   double angle;
@@ -154,14 +154,15 @@ void mof_Sprite__draw3Dscene(mof_Graphicelement *scene, mof_Sprite *sprite, mof_
   double distance = sqrt(pow((Sx - Px), 2) + pow((Sy - Py), 2));
   
   /* get top and bottom of sprite */
-  int bottom = (int)floor(10 * distanceFromProjectionPlane / distance + 240);
-  int top = (int)floor((-10) * distanceFromProjectionPlane / distance + 240);
+  int bottom = (int)floor(10 * distanceFromProjectionPlane / distance + (player->screen->h / 2));
+  int top = (int)floor((-10) * distanceFromProjectionPlane / distance + (player->screen->h / 2));
   double ratio = (double)(bottom - top) / 20;
   
   int Ps = 0;
-  Ps = -floor(320 * angle / 30);
-  mof_Graphicelement__add(scene, distance, (320 - (int)(10 * ratio) + Ps), top, ((320 + (int)(10 * ratio) + Ps) - (320 - (int)(10 * ratio) + Ps)), (bottom - top), 
-							0, 255, 0, 255);
+  Ps = -floor((player->screen->w / 2) * angle / 30);
+  mof_Graphicelement__add(scene, distance, ((player->screen->w / 2) - (int)(10 * ratio) + Ps), top, 
+						  (((player->screen->w / 2) + (int)(10 * ratio) + Ps) - ((player->screen->w / 2) - (int)(10 * ratio) + Ps)), (bottom - top), 
+						  0, 255, 0, 255);
 }
 
 #endif
